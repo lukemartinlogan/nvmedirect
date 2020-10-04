@@ -1,2 +1,0 @@
-/usr/bin/ar qc liblibnvmed.a  CMakeFiles/libnvmed.dir/library/lib_nvmed.c.o CMakeFiles/libnvmed.dir/library/utils/radix-tree.c.o
-/usr/bin/ranlib liblibnvmed.a

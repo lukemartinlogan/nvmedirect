@@ -1,4 +1,0 @@
-/home/lukemartinlogan/Documents/Projects/PhD/nvmedirect/build/CMakeFiles/rebuild_cache.dir
-/home/lukemartinlogan/Documents/Projects/PhD/nvmedirect/build/CMakeFiles/edit_cache.dir
-/home/lukemartinlogan/Documents/Projects/PhD/nvmedirect/build/CMakeFiles/libnvmed.dir
-/home/lukemartinlogan/Documents/Projects/PhD/nvmedirect/build/CMakeFiles/build-modules.dir
