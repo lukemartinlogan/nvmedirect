@@ -13,46 +13,101 @@ Systems (HotStorage), Denver, Colorado, USA, June 2016.
 
 ## How to build and run
 
-To build the kernel module and shared library,
+### Create a VM of Ubuntu 16.04
 
-    $ make
+Download 64-bit Ubuntu 16.04 and install virtualbox
+```
+wget https://releases.ubuntu.com/16.04/ubuntu-16.04.7-server-amd64.iso
+sudo apt-get install virtualbox
+```
 
-To install the kernel module, shared library, and header file,
+1. Open VirtualBox  
+2. Install Ubuntu16.04  
+3. When done, navigate to File -> Host Network Manager at the top-left of VirtualBox  
+4. Add a new Host Adapter
+    - Remember the IPv4 Address
+    - In my case, it's 192.168.56.1
+5. Close out of this menu and go to Settings -> Network  
+6. For Adapter 1, go to Advanced -> Port Forwarding  
+    - The host port can be anything unused; I use 4632  
+    - The guest port should be 22  
+7. Go to Adapter 2, set Attached to: Host-only Adapter  
 
-    $ sudo make install
+### Connect to VM through SSH
+#### Install OpenSSH on the VM
+```
+sudo apt-get install git openssh-server make gcc
+sudo nano /etc/ssh/sshd_config
+#Set PermitEmptyPasswords to yes (on line 45)
+sudo service sshd restart
+```
 
-This will install the following files:
+#### Setup passwordless authentication to the VM on the host machine
+1. ssh-keygen  
+2. ssh-copy-id -f -i ~/.ssh/id_rsa -p 4632 lukemartinlogan@192.168.56.1  
+3. chmod 600 ~/.ssh/authorized_keys  
+4. ssh -p 4632 lukemartinlogan@192.168.56.1  
 
-- nvmed.ko in /lib/modules/$(shell uname -r)/extra
+### Install Kernel 4.3.3 Headers
 
-- lib_nvmed.h in /usr/local/include
+For 64-bit systems (use this):
+```
+mkdir kern
+cd kern
+wget https://kernel.ubuntu.com/~kernel-ppa/mainline/v4.3.3-wily/linux-headers-4.3.3-040303_4.3.3-040303.201512150130_all.deb
+wget https://kernel.ubuntu.com/~kernel-ppa/mainline/v4.3.3-wily/linux-headers-4.3.3-040303-generic_4.3.3-040303.201512150130_amd64.deb
+wget https://kernel.ubuntu.com/~kernel-ppa/mainline/v4.3.3-wily/linux-image-4.3.3-040303-generic_4.3.3-040303.201512150130_amd64.deb
+sudo dpkg -i *.deb
+```
 
-- libnvmed.so in /usr/local/lib
+For 32-bit systems (included for completeness, don't use):
+```
+mkdir kern
+cd kern
+wget https://kernel.ubuntu.com/~kernel-ppa/mainline/v4.3.3-wily/linux-headers-4.3.3-040303_4.3.3-040303.201512150130_all.deb
+wget https://kernel.ubuntu.com/~kernel-ppa/mainline/v4.3.3-wily/linux-headers-4.3.3-040303-generic_4.3.3-040303.201512150130_i386.deb
+wget https://kernel.ubuntu.com/~kernel-ppa/mainline/v4.3.3-wily/linux-image-4.3.3-040303-generic_4.3.3-040303.201512150130_i386.deb
+sudo dpkg -i *.deb
+```
 
-- nvmed_admin in /usr/local/bin
+### Build NVMeDirect
 
-To load the NVMeDirect module into the kernel,
+```
+git clone https://github.com/lukemartinlogan/nvmedirect.git
+cd nvmedirect
+mkdir build
+cd build
+cmake ../
+make
+make build-module
+```
 
-    $ sudo modprobe nvmed
+### Playing with NVMeDirect
 
-The root can restrict the users of the NVMeDirect framework and the number of
-I/O queues per user using the user-space tool, nvmed_admin.
+To install/remove the kernel module:
+```
+make install-module
+make remove-module
+```
 
-    $ sudo nvmed_admin /dev/nvme[device id]n[namespace id] set [user name] [queue count]
+To print and clear the kernel log (could be useful for debugging):
+```
+make print-klog
+make clear-klog
+```
 
-Finally, link your program with the NVMeDirect library and run!
-
+Modify the CMakeLists.txt in order to build a program that uses the NVMeDirect API.
+A template is given to you at the bottom of the CMake.
 
 ## How to use NVMeDirect APIs
 
+
 Please refer to the [NVMeDirect-APIs.md](https://github.com/nvmedirect/nvmedirect/blob/master/NVMeDirect-APIs.md) file.
-
-
 ## Contacts
 
-The NVMeDirect framework is being currently maintained by [Computer Systems 
-Laboratory](http://csl.skku.edu) in Sungkyunkwan University, South Korea. 
-NVMeDirect is an on-going work and we welcome your contribution and feedback. 
+The NVMeDirect framework is being currently maintained by [Computer Systems
+Laboratory](http://csl.skku.edu) in Sungkyunkwan University, South Korea.
+NVMeDirect is an on-going work and we welcome your contribution and feedback.
 If you have any questions or suggestions, please contact the following people.
 
 - Hyeong-Jun Kim (hjkim@csl.skku.edu)
