@@ -10,8 +10,8 @@ set(CMAKE_CXX_FLAGS "-Wall -fPIC")
 #Build the kernel module
 add_custom_target(build-module COMMAND bash ${CMAKE_SOURCE_DIR}/modules/build-module.sh ${CMAKE_SOURCE_DIR})
 add_custom_target(insert-module COMMAND sudo insmod ${CMAKE_SOURCE_DIR}/modules/nvmed.ko)
-add_custom_target(remove-module COMMAND sudo insmod nvmed)
-add_custom_target(print-klog COMMAND dmesg)
+add_custom_target(remove-module COMMAND sudo rmmod nvmed)
+add_custom_target(print-klog COMMAND sudo dmesg)
 add_custom_target(clear-klog COMMAND sudo dmesg --clear)
 
 #Build the NVMeDirect library
@@ -19,9 +19,9 @@ add_library(libnvmed SHARED library/lib_nvmed.c library/utils/radix-tree.c)
 target_link_libraries(libnvmed -pthread -shared)
 
 #The example they made
-add_executable(nvmed_ex example/nvmed_example.c)
+add_executable(nvmed_ex example/nvmed_example/nvmed_example.c)
 add_dependencies(nvmed_ex libnvmed)
-target_link_libraries(nvme_ex -pthread libnvmed)
+target_link_libraries(nvmed_ex -pthread libnvmed)
 
 #TODO: Create a program the uses NVMeDirect
 add_executable(nvmed_test src/nvmedirect-io.cpp)
@@ -33,7 +33,6 @@ option(BUILD_TEST "Build the unit tests" ON)
 if(BUILD_TEST)
     enable_testing()
     include(CTest)
-    add_subdirectory(test/unit)
 endif()
 
 add_test(NAME nvmed_ex_test COMMAND ${CMAKE_BINARY_DIR}/nvmed_ex /dev/nvme0n1)
