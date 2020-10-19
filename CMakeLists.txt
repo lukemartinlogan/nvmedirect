@@ -18,7 +18,23 @@ add_custom_target(clear-klog COMMAND sudo dmesg --clear)
 add_library(libnvmed SHARED library/lib_nvmed.c library/utils/radix-tree.c)
 target_link_libraries(libnvmed -pthread -shared)
 
+#The example they made
+add_executable(nvmed_ex example/nvmed_example.c)
+add_dependencies(nvmed_ex libnvmed)
+target_link_libraries(nvme_ex -pthread libnvmed)
+
 #TODO: Create a program the uses NVMeDirect
 add_executable(nvmed_test src/nvmedirect-io.cpp)
 target_include_directories(nvmed_test PUBLIC include)
 target_link_libraries(nvmed_test libnvmed)
+
+# Enable tests
+option(BUILD_TEST "Build the unit tests" ON)
+if(BUILD_TEST)
+    enable_testing()
+    include(CTest)
+    add_subdirectory(test/unit)
+endif()
+
+add_test(NAME nvmed_ex_test COMMAND ${CMAKE_BINARY_DIR}/nvmed_ex /dev/nvme0n1)
+set_property(TEST nvmed_ex_test APPEND PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}")
