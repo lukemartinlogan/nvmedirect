@@ -18,7 +18,7 @@ Systems (HotStorage), Denver, Colorado, USA, June 2016.
 Download 64-bit Ubuntu 16.04 and install virtualbox
 ```
 wget https://releases.ubuntu.com/16.04/ubuntu-16.04.7-server-amd64.iso
-sudo apt-get install virtualbox
+sudo apt-get install virtualbox virtualbox-ext-pack
 ```
 
 1. Open VirtualBox  

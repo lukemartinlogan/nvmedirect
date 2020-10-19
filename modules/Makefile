@@ -1,4 +1,5 @@
-KERNELDIR := /lib/modules/4.3.3-040303-generic/build
+#KERNELDIR := /lib/modules/4.3.3-040303-generic/build
+KERNELDIR := /lib/modules/$(shell uname - r)/build
 PWD     := $(shell pwd)
 
 KERNEL_VERSION_MAJOR = $(shell $(MAKE) -C $(KERNELDIR) -s kernelversion | cut -f1 -d.)
